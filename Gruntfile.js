@@ -8,6 +8,23 @@
 
 module.exports = function(grunt) {
   grunt.initConfig({
+    /* Minify html https://github.com/gruntjs/grunt-contrib-htmlmin */
+    htmlmin: {
+      dist: {
+        options: {
+          removeComments: true,
+          removeCommentsFromCDATA: true,
+          removeScriptTypeAttributes: true,
+          removeStyleLinkTypeAttributes: true,
+          minifyJS: true,
+          collapseWhitespace: true,
+          conservativeCollapse: true
+        },
+        files: {
+          'index.min.html': 'index.html'
+        }
+      }
+    },
 
     /* Inline and minify css https://github.com/chyingp/grunt-inline */
     inline: {
@@ -85,12 +102,13 @@ module.exports = function(grunt) {
     },
   });
 
+  grunt.loadNpmTasks('grunt-contrib-htmlmin');
   grunt.loadNpmTasks('grunt-inline');
   grunt.loadNpmTasks('grunt-responsive-images');
   grunt.loadNpmTasks('grunt-imageoptim');
   grunt.loadNpmTasks('grunt-contrib-clean');
   grunt.loadNpmTasks('grunt-contrib-copy');
   grunt.loadNpmTasks('grunt-mkdir');
-  grunt.registerTask('default', ['clean', 'mkdir', 'copy','inline', 'responsive_images', 'imageoptim']);
+  grunt.registerTask('default', ['clean', 'mkdir', 'copy','inline', 'htmlmin', 'responsive_images', 'imageoptim']);
 
 };
