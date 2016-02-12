@@ -7,18 +7,30 @@
 */
 
 module.exports = function(grunt) {
-  /* run after responsive_images for further optimizations with ImageOptim.
-  Leave jPeg mini false, its not installed (its $20!)
-  You can set imageAlpha to true, it works on png's only and is lossy
-  ImageOptim is already true (all are true by default) */
   grunt.initConfig({
+
+    /* Inline and minify css https://github.com/chyingp/grunt-inline */
+    inline: {
+      dist: {
+        options: {
+          cssmin: true
+        },
+        src: 'index_src.html',
+        dest: 'index.html'
+      }
+    },
+
+    /* run after responsive_images for further optimizations with ImageOptim.
+    Leave jPeg mini false, its not installed (its $20!)
+    You can set imageAlpha to true, it works on png's only and is lossy
+    ImageOptim is already true (all are true by default) */
     imageoptim: {
       myTask: {
         options: {
           jpegMini: false,
           imageAlpha: false
         },
-        src: ['img']
+        src: ['img','views/images']
       }
     },
 
@@ -73,11 +85,12 @@ module.exports = function(grunt) {
     },
   });
 
+  grunt.loadNpmTasks('grunt-inline');
   grunt.loadNpmTasks('grunt-responsive-images');
   grunt.loadNpmTasks('grunt-imageoptim');
   grunt.loadNpmTasks('grunt-contrib-clean');
   grunt.loadNpmTasks('grunt-contrib-copy');
   grunt.loadNpmTasks('grunt-mkdir');
-  grunt.registerTask('default', ['clean', 'mkdir', 'copy', 'responsive_images', 'imageoptim']);
+  grunt.registerTask('default', ['clean', 'mkdir', 'copy','inline', 'responsive_images', 'imageoptim']);
 
 };
