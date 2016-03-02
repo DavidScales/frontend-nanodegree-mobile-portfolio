@@ -1,8 +1,9 @@
 /*
   Code Partly From Udacity Responsive Images Course
 
-  Automatically resize and optimize images, minify and internalize css,
-  minify html and inline js, and manage the associate files and directories.
+  Automatically resize and optimize images, minify and internalize critical css,
+  minify non-critical css, uglify js (non-critical),
+  minify html and inlined js, and manage the associate files and directories.
 
   Can be used to check PageSpeed Insights - requires manual set up.
   Manual call with 'grunt pagespeed.'
@@ -50,7 +51,32 @@ module.exports = function(grunt) {
       }
     },
 
-    /* Minify my main html file, index.html
+    /* Minify css files. Only print.css (non-critical) needs minification,
+    as style.css (critical) is minified & internalized by grunt-inline.
+    https://github.com/gruntjs/grunt-contrib-cssmin */
+    cssmin: {
+      target: {
+        files: [{
+          expand: true,
+          cwd: 'css',
+          src: ['print.css'],
+          dest: 'css',
+          ext: '.min.css'
+        }]
+      }
+    },
+
+    /* Uglify non-critical perfmatters.js
+    https://github.com/gruntjs/grunt-contrib-uglify */
+    uglify: {
+      my_target: {
+        files: {
+          'js/perfmatters.min.js': ['js/perfmatters.js'] // dest : src
+        }
+      }
+    },
+
+    /* Minify my main html file, index.html, including inlined js
     https://github.com/gruntjs/grunt-contrib-htmlmin */
     htmlmin: {
       dist: {
@@ -154,5 +180,5 @@ module.exports = function(grunt) {
   // replaces grunt.loadNpmTask('grunt-...'); lines for each plugin
   require('load-grunt-tasks')(grunt);
 
-  grunt.registerTask('default', ['clean', 'mkdir', 'copy','inline', 'htmlmin', 'responsive_images', 'imageoptim']);
+  grunt.registerTask('default', ['clean', 'mkdir', 'copy','inline', 'uglify', 'htmlmin', 'cssmin', 'responsive_images', 'imageoptim']);
 };
