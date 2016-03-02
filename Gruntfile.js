@@ -165,6 +165,10 @@ module.exports = function(grunt) {
             width: 115,
             rename: false,
             quality: 60
+          }, {
+            width: 720,
+            rename: true,
+            quality: 60
           }]
         },
 
