@@ -129,6 +129,13 @@ module.exports = function(grunt) {
         },
         src: 'project-2048_src.html',
         dest: 'project-2048.html'
+      },
+      task4: {
+        options: {
+          cssmin: true
+        },
+        src: 'views/pizza_src.html',
+        dest: 'views/pizza.html'
       }
     },
 
