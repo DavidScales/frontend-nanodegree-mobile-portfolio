@@ -54,8 +54,6 @@ module.exports = function(grunt) {
     /* Minify css files. Only print.css (non-critical) needs minification,
     as style.css (critical) is minified & internalized by grunt-inline.
 
-    However, I will minimize style.css, as the other pages use it.
-
     https://github.com/gruntjs/grunt-contrib-cssmin */
     cssmin: {
       target: {
@@ -69,17 +67,18 @@ module.exports = function(grunt) {
       }
     },
 
-    /* Uglify non-critical perfmatters.js
+    /* Uglify js
     https://github.com/gruntjs/grunt-contrib-uglify */
     uglify: {
       my_target: {
         files: {
-          'js/perfmatters.min.js': ['js/perfmatters.js'] // dest : src
+          'js/perfmatters.min.js': ['js/perfmatters.js'], // dest : src
+          'views/js/main.min.js': ['views/js/main.js'], // dest : src
         }
       }
     },
 
-    /* Minify my main html file, index.html, including inlined js
+    /* Minify html files, including inlined js
     https://github.com/gruntjs/grunt-contrib-htmlmin */
     htmlmin: {
       dist: {
@@ -93,12 +92,17 @@ module.exports = function(grunt) {
           conservativeCollapse: true // preserve a single whitespace, to prevent potential errors
         },
         files: {
-          'index.min.html': 'index.html' // destination : source
+          'index.min.html': 'index.html', // destination : source
+          'project-mobile.min.html' : 'project-mobile.html', // destination : source
+          'project-2048.min.html' : 'project-2048.html', // destination : source
+          'project-webperf.min.html' : 'project-webperf.html', // destination : source
+          'views/pizza.min.html' : 'views/pizza.html' // destination : source
         }
       }
     },
 
-    /*  Minify and internalize style.css into <style> in index.html
+    /*  Minify and internalize critical css into <style> in html files.
+
      * Mark href with ?__inline=true
      * https://github.com/chyingp/grunt-inline */
     inline: {
