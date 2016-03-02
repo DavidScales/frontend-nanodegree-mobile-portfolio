@@ -3,10 +3,52 @@
 
   Automatically resize and optimize images, minify and internalize css,
   minify html and inline js, and manage the associate files and directories.
+
+  Can be used to check PageSpeed Insights - requires manual set up.
+  Manual call with 'grunt pagespeed.'
+
+  2016-03-02
+  Tried to automate pagespeed with:
+    http://www.jamescryer.com/2014/06/12/grunt-pagespeed-and-ngrok-locally-testing/
+    https://github.com/jrcryer/grunt-pagespeed-ngrok-sample
+  But Recent bug is preventing access:
+    https://github.com/inconshreveable/ngrok/issues/248
 */
 
 module.exports = function(grunt) {
+
   grunt.initConfig({
+
+    /* PageSpeed Insights report. Requires manual set up.
+    https://www.npmjs.com/package/grunt-pagespeed
+
+    Input url's into marked options below.
+
+    For local testing:
+    Start local server: python -m SimpleHTTPServer 8080
+    Expose server with ngrok(need download https://ngrok.com/): ./ngrok http 8080 */
+    pagespeed: {
+      options: {
+        nokey: true,
+        locale: 'en_GB',
+        threshold: 40,
+        url: 'https://www.google.com/' // Set target url. (or ngrok provided url, if local)
+      },
+      local: {
+        options: {
+          locale: 'en_GB',
+          strategy: 'desktop',
+          url: 'https://www.google.com/' // Set target url. (or ngrok provided url, if local)
+        }
+      },
+      mobile: {
+        options: {
+          locale: 'en_GB',
+          strategy: 'mobile',
+          url: 'https://www.google.com/' // Set target url. (or ngrok provided url, if local)
+        }
+      }
+    },
 
     /* Minify my main html file, index.html
     https://github.com/gruntjs/grunt-contrib-htmlmin */
@@ -108,13 +150,9 @@ module.exports = function(grunt) {
     },
   });
 
-  grunt.loadNpmTasks('grunt-contrib-htmlmin');
-  grunt.loadNpmTasks('grunt-inline');
-  grunt.loadNpmTasks('grunt-responsive-images');
-  grunt.loadNpmTasks('grunt-imageoptim');
-  grunt.loadNpmTasks('grunt-contrib-clean');
-  grunt.loadNpmTasks('grunt-contrib-copy');
-  grunt.loadNpmTasks('grunt-mkdir');
-  grunt.registerTask('default', ['clean', 'mkdir', 'copy','inline', 'htmlmin', 'responsive_images', 'imageoptim']);
+  // Load grunt tasks, loads tasks automatically from package.json
+  // replaces grunt.loadNpmTask('grunt-...'); lines for each plugin
+  require('load-grunt-tasks')(grunt);
 
+  grunt.registerTask('default', ['clean', 'mkdir', 'copy','inline', 'htmlmin', 'responsive_images', 'imageoptim']);
 };

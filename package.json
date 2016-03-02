@@ -16,7 +16,10 @@
     "grunt-imageoptim": "^1.4.1",
     "grunt-inline": "^0.3.6",
     "grunt-mkdir": "^0.1.2",
-    "grunt-responsive-images": "^0.1.4"
+    "grunt-pagespeed": "^2.0.0",
+    "grunt-responsive-images": "^0.1.4",
+    "load-grunt-tasks": "^3.4.1",
+    "ngrok": "^0.2.3"
   },
   "dependencies": {
     "grunt-responsive-images": "^0.1.6"
