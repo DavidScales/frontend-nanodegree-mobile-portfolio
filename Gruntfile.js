@@ -53,6 +53,9 @@ module.exports = function(grunt) {
 
     /* Minify css files. Only print.css (non-critical) needs minification,
     as style.css (critical) is minified & internalized by grunt-inline.
+
+    However, I will minimize style.css, as the other pages use it.
+
     https://github.com/gruntjs/grunt-contrib-cssmin */
     cssmin: {
       target: {
@@ -99,12 +102,33 @@ module.exports = function(grunt) {
      * Mark href with ?__inline=true
      * https://github.com/chyingp/grunt-inline */
     inline: {
-      dist: {
+      task1: {
         options: {
           cssmin: true
         },
         src: 'index_src.html',
         dest: 'index.html'
+      },
+      task2: {
+        options: {
+          cssmin: true
+        },
+        src: 'project-mobile_src.html',
+        dest: 'project-mobile.html'
+      },
+      task3: {
+        options: {
+          cssmin: true
+        },
+        src: 'project-webperf_src.html',
+        dest: 'project-webperf.html'
+      },
+      task4: {
+        options: {
+          cssmin: true
+        },
+        src: 'project-2048_src.html',
+        dest: 'project-2048.html'
       }
     },
 
