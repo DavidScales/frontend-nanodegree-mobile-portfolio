@@ -1,6 +1,14 @@
 /*
   Code Partly From Udacity Responsive Images Course
 
+  1. Inline (and minify) css.
+  2. Minify html (and inlined js).
+  3. Uglify js
+  4. Minify remaining css
+  5. Clean and make image directories, copy fixed images
+  6. Resize and optimize images
+
+
   Automatically resize and optimize images, minify and internalize critical css,
   minify non-critical css, uglify js (non-critical),
   minify html and inlined js, and manage the associate files and directories.
@@ -59,10 +67,10 @@ module.exports = function(grunt) {
       target: {
         files: [{
           expand: true,
-          cwd: 'css',
+          cwd: 'src/css',
           src: ['print.css'],
           dest: 'css',
-          ext: '.min.css'
+          ext: '.css'
         }]
       }
     },
@@ -72,8 +80,8 @@ module.exports = function(grunt) {
     uglify: {
       my_target: {
         files: {
-          'js/perfmatters.min.js': ['js/perfmatters.js'], // dest : src
-          'views/js/main.min.js': ['views/js/main.js'], // dest : src
+          'js/perfmatters.js': ['src/js/perfmatters.js'], // dest : src
+          'views/js/main.js': ['views/src/js/main.js'], // dest : src
         }
       }
     },
@@ -92,11 +100,11 @@ module.exports = function(grunt) {
           conservativeCollapse: true // preserve a single whitespace, to prevent potential errors
         },
         files: {
-          'index.min.html': 'index.html', // destination : source
-          'project-mobile.min.html' : 'project-mobile.html', // destination : source
-          'project-2048.min.html' : 'project-2048.html', // destination : source
-          'project-webperf.min.html' : 'project-webperf.html', // destination : source
-          'views/pizza.min.html' : 'views/pizza.html' // destination : source
+          'index.html': 'index.html', // destination : source
+          'project-mobile.html' : 'project-mobile.html', // destination : source
+          'project-2048.html' : 'project-2048.html', // destination : source
+          'project-webperf.html' : 'project-webperf.html', // destination : source
+          'views/pizza.html' : 'views/pizza.html' // destination : source
         }
       }
     },
@@ -110,35 +118,35 @@ module.exports = function(grunt) {
         options: {
           cssmin: true
         },
-        src: 'index_src.html',
+        src: 'src/index.html',
         dest: 'index.html'
       },
       task2: {
         options: {
           cssmin: true
         },
-        src: 'project-mobile_src.html',
+        src: 'src/project-mobile.html',
         dest: 'project-mobile.html'
       },
       task3: {
         options: {
           cssmin: true
         },
-        src: 'project-webperf_src.html',
+        src: 'src/project-webperf.html',
         dest: 'project-webperf.html'
       },
       task4: {
         options: {
           cssmin: true
         },
-        src: 'project-2048_src.html',
+        src: 'src/project-2048.html',
         dest: 'project-2048.html'
       },
-      task4: {
+      task5: {
         options: {
           cssmin: true
         },
-        src: 'views/pizza_src.html',
+        src: 'views/src/pizza.html',
         dest: 'views/pizza.html'
       }
     },
@@ -180,7 +188,7 @@ module.exports = function(grunt) {
         files: [{
           expand: true,
           src: ['*.{gif,jpg,png,jpeg}'],
-          cwd: 'views/images_src/',
+          cwd: 'views/src/images/',
           dest: 'views/images/'
         }]
       }
@@ -208,7 +216,7 @@ module.exports = function(grunt) {
         files: [{
           expand: true,
           src: '*.{gif,jpg,png}',
-          cwd: 'views/images_src/fixed/',
+          cwd: 'views/src/images/fixed/',
           dest: 'views/images/'
         }]
       },
@@ -219,5 +227,5 @@ module.exports = function(grunt) {
   // replaces grunt.loadNpmTask('grunt-...'); lines for each plugin
   require('load-grunt-tasks')(grunt);
 
-  grunt.registerTask('default', ['clean', 'mkdir', 'copy','inline', 'uglify', 'htmlmin', 'cssmin', 'responsive_images', 'imageoptim']);
+  grunt.registerTask('default', ['inline', 'htmlmin', 'uglify', 'cssmin', 'clean', 'mkdir', 'copy', 'responsive_images', 'imageoptim']);
 };
