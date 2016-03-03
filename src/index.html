@@ -7,7 +7,11 @@
     <meta name="author" content=" FILL ME IN ">
     <title>Cameron Pittman: Portfolio</title>
     <!-- remove google fonts, inline into style.css -->
+
+    <!-- Added '__inline=true' signals to a gruntfile that this css resource can be
+    inlined. This will reduce file requests in our production code, as the css and html will be in a single file -->
     <link href="css/style.css?__inline=true" rel="stylesheet">
+    <!-- Add media query to prevent print stylesheet from loading by default -->
     <link href="css/print.css" rel="stylesheet" media="print">
 
     <script>
@@ -18,6 +22,7 @@
       ga('create', 'UA-XXXX-Y');
       ga('send', 'pageview');
     </script>
+    <!-- Defer google analytics file to after the page has loaded, since its not critical to our initial loading and it will block the loading process -->
     <script defer src="http://www.google-analytics.com/analytics.js"></script>
     <script async src="js/perfmatters.js"></script>
   </head>

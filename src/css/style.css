@@ -1,3 +1,7 @@
+/* Inlining fonts like this, allows the browser to send their css requests
+immediately, rather than having to wait until the required fonts are established
+ when building the render tree. Since we are sure these fonts will be used, we
+ can safely request them right away. */
 /* latin */
 @font-face {
   font-family: 'Open Sans';

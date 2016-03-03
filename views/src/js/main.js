@@ -432,6 +432,13 @@ var resizePizzas = function(size) {
     var randomPizzaContainer = document.querySelectorAll(".randomPizzaContainer");
 
     for (var i = 0, l = randomPizzaContainer.length; i < l; i++) {
+       /* Rather than calculating absolute pixel changes, we can simply set the
+          new width of our container based on a pre-determined percentage (from
+          changeSliderLabel). This also allows us to remove layout thrashing,
+          since we dont need to repeatedly read geometric properties. Finally
+          This reduction prevents unnecessary look ups on the DOM, buy performing
+          a single lookup outside of this loop, and simply referencing it within the
+          loop. */
       randomPizzaContainer[i].style.width = newWidth;
     }
   }
@@ -481,6 +488,9 @@ function updatePositions() {
   frame++;
   window.performance.mark("mark_start_frame");
 
+  /* We should remove as many computations and lookups as possible, so that these
+  time consuming operations can be done only once, rather than multiple times,
+  since the data is constant. */
   var normalizeScrollTop = document.body.scrollTop/1250;
   var phase = [];
   for (var i = 0; i < 5; i++) {
@@ -489,7 +499,9 @@ function updatePositions() {
 
   var items = document.querySelectorAll('.mover');
   for (var i = 0, len = items.length; i < len; i++) {
-    // items[i].style.left = items[i].basicLeft + 100 * phase[i % 5] + 'px';
+    /* Using css's transform property instead of a geometric one, allows
+    use to avoid triggering layout and paint. This give us a ton of time savings,
+    as these operations are particularly expensive. */
     var pos = items[i].basicLeft + (100 * phase[i % 5]);
     items[i].style.transform = 'translate3d(' + pos + 'px, 0, 0)';
   }
@@ -511,6 +523,12 @@ window.addEventListener('scroll', tryRequestAnimationFrame);
 
 // Paul Lewis - http://www.html5rocks.com/en/tutorials/speed/animations/
 // and mcs - https://discussions.udacity.com/t/p4-pizza-scrolling-rasterize-paint/30713/12
+/* Using request animation frame helps the browser ensure that our js-style-layout
+pipeline stays in the correct order, so that js is executed as early as possibly,
+and animations work with the browsers timing, rather than agaisnt it. Adding the
+window.requested variable, helps to ensure that we are only making new requests to
+requestAnimationFrame/updatePizzas once a previous request has been completed. Requesting
+faster than this will just cause requests to pile up. */
 function tryRequestAnimationFrame() {
   if (!window.requested) {
     requestAnimationFrame(updatePositions);
@@ -521,6 +539,10 @@ function tryRequestAnimationFrame() {
 // Generates the sliding pizzas when the page loads.
 document.addEventListener('DOMContentLoaded', function() {
   var s = 256;
+  /* Rather than use a hard-coded value of pizzas elements that is potentially too
+   large (manipulating more elements than are even visible one the screen!) or too
+   small (not enough elements visible on the screen) The optimal number can be
+   calculated by using the window width and height. */
   var cols = Math.floor(window.innerWidth / s) + 1;
   var rows = Math.floor(window.innerHeight / s) + 1;
   var numPizzas = rows * cols;
@@ -531,9 +553,6 @@ document.addEventListener('DOMContentLoaded', function() {
     elem.style.height = "100px";
     elem.style.width = "73.333px";
     elem.basicLeft = (i % cols) * s;
-    //
-    // elem.style.left = elem.basicLeft;
-
     elem.style.top = (Math.floor(i / cols) * s) + 'px';
     document.querySelector("#movingPizzas1").appendChild(elem);
   }
