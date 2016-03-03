@@ -489,7 +489,9 @@ function updatePositions() {
 
   var items = document.querySelectorAll('.mover');
   for (var i = 0, len = items.length; i < len; i++) {
-    items[i].style.left = items[i].basicLeft + 100 * phase[i % 5] + 'px';
+    // items[i].style.left = items[i].basicLeft + 100 * phase[i % 5] + 'px';
+    var pos = items[i].basicLeft + (100 * phase[i % 5]);
+    items[i].style.transform = 'translate3d(' + pos + 'px, 0, 0)';
   }
 
   window.requested = false;
@@ -529,6 +531,9 @@ document.addEventListener('DOMContentLoaded', function() {
     elem.style.height = "100px";
     elem.style.width = "73.333px";
     elem.basicLeft = (i % cols) * s;
+    //
+    // elem.style.left = elem.basicLeft;
+
     elem.style.top = (Math.floor(i / cols) * s) + 'px';
     document.querySelector("#movingPizzas1").appendChild(elem);
   }
