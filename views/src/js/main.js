@@ -492,6 +492,8 @@ function updatePositions() {
     items[i].style.left = items[i].basicLeft + 100 * phase[i % 5] + 'px';
   }
 
+  window.requested = false;
+
   // User Timing API to the rescue again. Seriously, it's worth learning.
   // Super easy to create custom metrics.
   window.performance.mark("mark_end_frame");
@@ -503,7 +505,16 @@ function updatePositions() {
 }
 
 // runs updatePositions on scroll
-window.addEventListener('scroll', updatePositions);
+window.addEventListener('scroll', tryRequestAnimationFrame);
+
+// Paul Lewis - http://www.html5rocks.com/en/tutorials/speed/animations/
+// and mcs - https://discussions.udacity.com/t/p4-pizza-scrolling-rasterize-paint/30713/12
+function tryRequestAnimationFrame() {
+  if (!window.requested) {
+    requestAnimationFrame(updatePositions);
+    window.requested = true;
+  }
+}
 
 // Generates the sliding pizzas when the page loads.
 document.addEventListener('DOMContentLoaded', function() {
