@@ -1,73 +1,263 @@
-## Website Performance Optimization portfolio project
+# Performance Optimization
+The goal of this project was to optimize the performance of a given website, or put more elegantly:
 
-Your challenge, if you wish to accept it (and we sure hope you will), is to optimize this online portfolio for speed! In particular, optimize the critical rendering path and make this page render as quickly as possible by applying the techniques you've picked up in the [Critical Rendering Path course](https://www.udacity.com/course/ud884).
+> As web applications become increasingly interactive and accessed on
+> a variety of devices there are a variety of opportunities in which
+> performance issues can hinder the user experience. This project
+> presents a number of those performance issues and provides an
+> opportunity to showcase your skills in identifying and optimizing
+> web applications.
 
-To get started, check out the repository, inspect the code,
+Throughout the project and proceeding course I learned about the critical rendering path (CRP), which is essentially the browser's pipeline of receiving, processing, and eventually rendering HTML, CSS, and JavaScript into a visible web page, and the dependencies between them. Further, I learned to see sites as continuously running applications, as opposed to static pages, and how to maintain a high and consistent frame rate in order to secure the best user experience.
 
-### Getting started
+## Optimizing the CRP and load time
+The first step in the project was to optimize the CRP, and bring the page load time down. [Google's PageSpeed Insights] PageSpeed score was used as the metric of performance.
 
-####Part 1: Optimize PageSpeed Insights score for index.html
+#### Starting out and setting up
+This project began by forking the [Web Performance Optimization] project, which is a repo with the original janky website. The forked repo was then cloned to my local machine. To test the performance of the site, it needs to be accessed via a server, rather than my local machine. Otherwise, resource requests are not actually being sent over the web.
 
-Some useful tips to help you get started:
+Trying to achieve this, I set up a local python server by running
+```sh
+    python -m SimpleHTTPServer 8080
+```
+in the project's working directory. This lets the directory act as a local server, but unfortunately, this still won't work for Google's Page Speed Insights, because my local server is not accessible remotely. To solve this, I used [ngrok] to securely expose my local server to the web.
+```sh
+    ./ngrok http 8080
+```
+Testing the website with Pagespeed Insights, I get a starting score of:
+- Mobile: 27
+- Desktop: 29
 
-1. Check out the repository
-1. To inspect the site on your phone, you can run a local server
+#### Media Queries
+I started by adding a media query to the non-critical CSS resource, print.css. This resource is only used if the page is being printed, and so it doesn't need to be requested and parsed before we start displaying content. Adding the attribute `media="print"` to the print.css external link tells the browser not to prioritize this file unless we are printing, and wait until after the page has rendered to request and process it.
 
-  ```bash
-  $> cd /path/to/your-project-folder
-  $> python -m SimpleHTTPServer 8080
-  ```
+#### Resizing and Optimizing Images
+Images can take up huge amounts of data and substantially hurt load time if neglected. The largest image of this site, had a natural width of 2048px, but was only about 115px wide on the actual site. Resizing and compressing the image reduced its size from 2.3MB to just 23KB (a 99% reduction), and reduced the total site data transferred from 2.3MB to 77.5KiB (a 96% reduction). While image resources are not render blocking, they can dramatically slow site loading.
 
-1. Open a browser and visit localhost:8080
-1. Download and install [ngrok](https://ngrok.com/) to make your local server accessible remotely.
+#### Deferring JavaScript
+By default, the browser assumes any JS is going to interact with and affect the DOM or CSSOM. So when JS is reached in parsing, it not only blocks further parsing of HTML (mostly), but also must wait for the CSSOM to finish construction. This can be a significant delay. If the JS is not going to interact with the DOM/CSSOM though, it can be marked with `defer` to postpone execution until after the page has loaded, avoiding any delay entirely.
 
-  ``` bash
-  $> cd /path/to/your-project-folder
-  $> ngrok http 8080
-  ```
+#### More Image Optimization
+Even though the remaining images don't need to be resized, they can still benefit from compression. Using another image tool, all site images were compressed (including the previously resized & compressed image, which compressed further). Again, while these are not CRP resources, this step does reduce the sites total transferred size from 77.5KB to 23.8KB (much of which may be overhead from GZIP or a similar process), a 69% reduction.
 
-1. Copy the public URL ngrok gives you and try running it through PageSpeed Insights! Optional: [More on integrating ngrok, Grunt and PageSpeed.](http://www.jamescryer.com/2014/06/12/grunt-pagespeed-and-ngrok-locally-testing/)
+#### Inlining Fonts
+Normally, a browser must construct the render tree (requiring the DOM and CSSOM) before it will know which fonts are needed, so font requests are postponed until late in the CRP. But the browser cannot render text until the font resources are received and downloaded, so rendering can get pushed back because of this. To get around the delay, the fonts were inlined into the main CSS file, style.css. This forces the browser to load the fonts immediately, since CSS resources are required for the CSSOM and thus high priority.
 
-Profile, optimize, measure... and then lather, rinse, and repeat. Good luck!
+#### Minification and Internalization of CSS
+Inlining a CSS resource, into the `<style>` tag of an HTML file eliminates the request for the CSS resource altogether. Additionally, minifying a file removes unnecessary whitespace (along with some other tricks), reducing a files size. Both of these were used on the main CSS resource, style.css, eliminating a critical request and reducing overall file sizes. One disadvantage of this strategy however, is that the process must be repeated for other pages that use the same CSS file, since it's internalized in the original page and not available to any additional pages. This can lead to redundant code, and an increase in the average size of pages as a result. For this project however, the advantage of avoiding the CSS resource request outweighed this drawback, especially since the CSS file itself is quite small.
 
-####Part 2: Optimize Frames per Second in pizza.html
+#### More Minification and Uglification
+Taking the previous step further, HTML files themselves can be minified, allowing further reduction in transferred file size. This was done for the main HTML file, index.html, as well as the aforementioned auxiliary CSS file, print.css. The sites JS file's were also similarly reduced, although this process is referred to as uglification.
 
-To optimize views/pizza.html, you will need to modify views/js/main.js until your frames per second rate is 60 fps or higher. You will find instructive comments in main.js. 
+#### Final PageSpeed Score
+While only the homepage was under scrutiny in this project, ultimately the above optimizations were performed on each of the site's pages, and the final PageSpeed scores were substantially higher:
+- Mobile: 95
+- Desktop: 96
 
-You might find the FPS Counter/HUD Display useful in Chrome developer tools described here: [Chrome Dev Tools tips-and-tricks](https://developer.chrome.com/devtools/docs/tips-and-tricks).
+There are certainly further optimizations that could be made (for example using srcset to make images more responsive, as I've learned in [another project]), however as far as the CRP is concerned, the PageScore is high and the site seems to load in about 700-1100ms on on simulated 3G network.
 
-### Optimization Tips and Tricks
-* [Optimizing Performance](https://developers.google.com/web/fundamentals/performance/ "web performance")
-* [Analyzing the Critical Rendering Path](https://developers.google.com/web/fundamentals/performance/critical-rendering-path/analyzing-crp.html "analyzing crp")
-* [Optimizing the Critical Rendering Path](https://developers.google.com/web/fundamentals/performance/critical-rendering-path/optimizing-critical-rendering-path.html "optimize the crp!")
-* [Avoiding Rendering Blocking CSS](https://developers.google.com/web/fundamentals/performance/critical-rendering-path/render-blocking-css.html "render blocking css")
-* [Optimizing JavaScript](https://developers.google.com/web/fundamentals/performance/critical-rendering-path/adding-interactivity-with-javascript.html "javascript")
-* [Measuring with Navigation Timing](https://developers.google.com/web/fundamentals/performance/critical-rendering-path/measure-crp.html "nav timing api"). We didn't cover the Navigation Timing API in the first two lessons but it's an incredibly useful tool for automated page profiling. I highly recommend reading.
-* <a href="https://developers.google.com/web/fundamentals/performance/optimizing-content-efficiency/eliminate-downloads.html">The fewer the downloads, the better</a>
-* <a href="https://developers.google.com/web/fundamentals/performance/optimizing-content-efficiency/optimize-encoding-and-transfer.html">Reduce the size of text</a>
-* <a href="https://developers.google.com/web/fundamentals/performance/optimizing-content-efficiency/image-optimization.html">Optimize images</a>
-* <a href="https://developers.google.com/web/fundamentals/performance/optimizing-content-efficiency/http-caching.html">HTTP caching</a>
+#### A Note on Automation
+Much of the tasks in the optimization process are highly tedious, especially if they must be re-done every time a change or update is made. To solve this I used [Grunt], a command line task runner. This allowed me to set up an automated process for most of these steps. For use, simply run `grunt` in the command line from the project directory, and the source files in the *src* directory will be optimized and placed into the *dist* directory (e.g. images will be resized and compressed, CSS will be inlined, files will be minified and uglified).
 
-### Customization with Bootstrap
-The portfolio was built on Twitter's <a href="http://getbootstrap.com/">Bootstrap</a> framework. All custom styles are in `dist/css/portfolio.css` in the portfolio repo.
+##### Some of the tools and Grunt plugins I used
+- [Image Magick]
+- [ImageOptim]
+- [ImageMagick plugin]
+- [ImageOptim plugin]
+- [CSS Inline plugin]
+- [CSS Minification plugin]
+- [HTML Minification plugin]
+- [JS Uglification plugin]
 
-* <a href="http://getbootstrap.com/css/">Bootstrap's CSS Classes</a>
-* <a href="http://getbootstrap.com/components/">Bootstrap's Components</a>
+## Optimizing FPS
+The second part of the project was to optimize the performance of pizza.html, which had major jank issues when the pizza images were resized and when the page was scrolled.
 
-### Sample Portfolios
+### Resizing
+The first major performance bottleneck was the section of code responsible for resizing pizza images on the screen. There were four sources of jank.
 
-Feeling uninspired by the portfolio? Here's a list of cool portfolios I found after a few minutes of Googling.
+##### Unnecessary DOM Lookups
+Looking up elements within the DOM can be expensive, especially when happening repeatedly. This code below, for resizing the pizza elements, redundantly calls `querySelectorAll(".randomPizzaContainer")` four times in this loop.
+```sh
+function changePizzaSizes(size) {
+    for (var i = 0; i < document.querySelectorAll(".randomPizzaContainer").length; i++) {
+      var dx = determineDx(document.querySelectorAll(".randomPizzaContainer")[i], size);
+      var newwidth = (document.querySelectorAll(".randomPizzaContainer")[i].offsetWidth + dx) + 'px';
+      document.querySelectorAll(".randomPizzaContainer")[i].style.width = newwidth;
+    }
+}
+```
+A better approach would be to perform this lookup just once, and store it in a variable. In fact, since the element being looked up each loop iteration is the same, we can factor it outside of the loop with that same variable, like so:
+```sh
+var randomPizzaContainer = document.querySelectorAll("randomPizzaContainer");
+function changePizzaSizes(size) {
+    for (var i = 0; i < randomPizzaContainer.length; i++) {
+      var dx = determineDx(randomPizzaContainer[i], size);
+      var newwidth = (randomPizzaContainer.offsetWidth + dx) + 'px';
+      document.randomPizzaContainer[i].style.width = newwidth;
+    }
+}
+```
+Now rather that performing lookups in every loop iteration, the computation is done only once.
 
-* <a href="http://www.reddit.com/r/webdev/comments/280qkr/would_anybody_like_to_post_their_portfolio_site/">A great discussion about portfolios on reddit</a>
-* <a href="http://ianlunn.co.uk/">http://ianlunn.co.uk/</a>
-* <a href="http://www.adhamdannaway.com/portfolio">http://www.adhamdannaway.com/portfolio</a>
-* <a href="http://www.timboelaars.nl/">http://www.timboelaars.nl/</a>
-* <a href="http://futoryan.prosite.com/">http://futoryan.prosite.com/</a>
-* <a href="http://playonpixels.prosite.com/21591/projects">http://playonpixels.prosite.com/21591/projects</a>
-* <a href="http://colintrenter.prosite.com/">http://colintrenter.prosite.com/</a>
-* <a href="http://calebmorris.prosite.com/">http://calebmorris.prosite.com/</a>
-* <a href="http://www.cullywright.com/">http://www.cullywright.com/</a>
-* <a href="http://yourjustlucky.com/">http://yourjustlucky.com/</a>
-* <a href="http://nicoledominguez.com/portfolio/">http://nicoledominguez.com/portfolio/</a>
-* <a href="http://www.roxannecook.com/">http://www.roxannecook.com/</a>
-* <a href="http://www.84colors.com/portfolio.html">http://www.84colors.com/portfolio.html</a>
+##### Forced Synchronous Layout
+Forced synchronous layout (FSL) occurs when a style event is triggered immediately after a layout event is triggered for the same element. Since style events naturally generate layout events, any layout events occurring before a style event will be invalidated (because all the layout computations for the page must be done again). This is wasted computation.
+
+We still have this problem in the new code, shown again below. Each time `determineDX` is called and `.offsetWidth` is accessed, layout events occur. This is followed by a `.style` access, which triggers a style event. Since this style event will generate yet another layout event, the previous two become invalidated.
+```sh
+var randomPizzaContainer = document.querySelectorAll("randomPizzaContainer");
+function changePizzaSizes(size) {
+    for (var i = 0; i < randomPizzaContainer.length; i++) {
+      var dx = determineDx(randomPizzaContainer[i], size);
+      var newwidth = (randomPizzaContainer.offsetWidth + dx) + 'px';
+      document.randomPizzaContainer[i].style.width = newwidth;
+    }
+}
+```
+##### Layout Thrashing
+In addition to the current FSL problem, layout thrashing is also occuring in this code. Layout thrashing happens when a geometric CSS property is accessed repeatedly, such as in a loop. Since these properties cause layout events, we get multiple layout events stacking up, eating through a lot of computation time. This is occurring in the two previously problematic lines
+```sh
+var dx = determineDx(randomPizzaContainer[i], size);
+var newwidth = (randomPizzaContainer.offsetWidth + dx) + 'px';
+```
+as `.offsetWidth` is a geometric property and `determinDx` also accesses `.offsetWidth`.
+
+##### Reduce Computation
+Looking further at these two problematic lines, and `determineDx` in particular, it can be seen that these lines and the function itself are essentially unnecessary. A better approach is to simply choose a percentage value in a switch statement (assigned to `newWidth`), and assign it directly as the `.width` property, since the sizes of the pizzas are finite. This eliminates a lot of computation, as well as the layout thrashing and FSL.
+```sh
+function changePizzaSizes(size) {
+    var randomPizzaContainer = document.getElementByClass("randomPizzaContainer");
+    for (var i = 0, l = randomPizzaContainer.length; i < l; i++) {
+      randomPizzaContainer[i].style.width = newWidth;
+    }
+}
+```
+Notice also that `getElementByClass` is used instead of `querySelectorAll`, as it is faster when choosing classes. Additionally the for loop has been rewritten from
+```sh
+for (var i = 0; i < randomPizzaContainer.length; i++)
+```
+which must compute the length of `randomPizzaContainer` on each iteration, to
+```sh
+ for (var i = 0, l = randomPizzaContainer.length; i < l; i++)
+```
+which only needs to compute the length once, and stores it as a variable for reference.
+
+##### Improvement
+Overall these optimizations brought the transition time for resizing the pizza images from 170-220ms to 0.5ms. A substantially improvement.
+
+
+### Scrolling
+The second major performance bottleneck was the section of code that animated the background pizza images during scrolling. The issues and solutions were similar.
+
+Looking at the code that animates the pizzas, we can see a number of issues again.
+```sh
+function updatePositions() {
+  ...
+  var items = document.querySelectorAll('.mover');
+  for (var i = 0; i < items.length; i++) {
+    var phase = Math.sin((document.body.scrollTop / 1250) + (i % 5));
+    items[i].style.left = items[i].basicLeft + 100 * phase + 'px';
+  }
+  ...
+```
+Rather than using `querySelectorAll`,
+```sh
+var items = document.querySelectorAll('.mover');
+```
+we could use `getElementByClassName`, which is faster:
+```sh
+var items = document.getElementByClassName('.mover');
+```
+
+Rather than calculate length on every loop iteration,
+```sh
+for (var i = 0; i < items.length; i++)
+```
+we could compute it once and store it as a variable:
+```sh
+for (var i = 0, len = items.length; i < len; i++)
+```
+Rather than do all the math within the loop,
+```sh
+var phase = Math.sin((document.body.scrollTop / 1250) + (i % 5));
+```
+We could factor some of it out:
+```sh
+  var phase = [];
+  for (var i = 0; i < 5; i++) {
+    phase.push(Math.sin(normalizeScrollTop + i));
+  }
+```
+Finally, this line here triggers style, which isn't inherently a problem.
+```sh
+items[i].style.left = items[i].basicLeft + 100 * phase + 'px';
+```
+However, style also triggers layout and paint, which is potentially the most expensive operation, especially when done repeatedly for multiple elements. Rather than repaint the whole screen for all of these pizzas, another approach is to use a CSS property that doesn't trigger paint at all, such as transform.
+```sh
+items[i].style.transform = 'translate3d(' + pos + 'px, 0, 0)';
+```
+This promotes the pizza images to their own layer, and simply shifts them around the screen during animation, rather than constantly repainting them. The final improved function is significantly optimized:
+```sh
+function updatePositions() {
+  ...
+  var normalizeScrollTop = document.body.scrollTop/1250;
+  var phase = [];
+  for (var i = 0; i < 5; i++) {
+    phase.push(Math.sin(normalizeScrollTop + i));
+  }
+  var items = document.getElementByClassName('.mover');
+  for (var i = 0, len = items.length; i < len; i++) {
+    var pos = items[i].basicLeft + (100 * phase[i % 5]);
+    items[i].style.transform = 'translate3d(' + pos + 'px, 0, 0)';
+  }
+  ...
+```
+
+Further, rather than initially generating 200 pizza items (most of which aren't even visible on screen)
+```sh
+for (var i = 0; i < 200; i++)
+```
+we can calculate the minimum needed to cover the visible window:
+```sh
+var cols = Math.floor(window.innerWidth / s) + 1;
+var rows = Math.floor(window.innerHeight / s) + 1;
+var numPizzas = rows * cols;
+for (var i = 0; i < numPizzas; i++)
+```
+This means that instead of updating 200 objects, we may only need to update 25-35. And finally, rather than updating on every scroll event with
+```sh
+window.addEventListener('scroll', updatePositions);
+```
+we can use requestAnimationFrame (rAF), which lets the browser have more control over the timing of animations, so that we can work with the browser's timing pipeline rather than against it:
+```sh
+window.addEventListener('scroll', tryRequestAnimationFrame);
+function tryRequestAnimationFrame() {
+  if (!window.requested) {
+    requestAnimationFrame(updatePositions);
+    window.requested = true;
+  }
+}
+```
+(The `window.requested` feature helps ensure that rAF is only called when the previous rAF has finished.)
+##### Improvement
+Initially the site's frames per second (fps) was about 13 or 14, and the `updatePositions` function itself took about 55ms to execute. After the optimizations, `updatePositions` executes in about 0.3-0.6ms, and the frame rate is consistently 55-60fps.
+
+
+[Google's PageSpeed Insights]: <https://developers.google.com/speed/pagespeed/insights/>
+[Web Performance Optimization]: <https://github.com/udacity/frontend-nanodegree-mobile-portfolio>
+[ngrok]: <https://ngrok.com/>
+[Grunt]: <http://gruntjs.com/>
+[another project]: <https://github.com/DavidScales/portfolio>
+
+[Image Magick]: <http://www.imagemagick.org/script/index.php>
+[ImageOptim]: <https://imageoptim.com/>
+[ImageMagick plugin]: <https://github.com/andismith/grunt-responsive-images>
+[ImageOptim plugin]: <https://github.com/JamieMason/grunt-imageoptim>
+[CSS Inline plugin]: <https://github.com/chyingp/grunt-inline>
+[CSS Minification plugin]: <https://github.com/gruntjs/grunt-contrib-cssmin>
+[HTML Minification plugin]: <https://github.com/gruntjs/grunt-contrib-htmlmin>
+[JS Uglification plugin]: <https://github.com/gruntjs/grunt-contrib-uglify>
+
+License
+----
+
+MIT
