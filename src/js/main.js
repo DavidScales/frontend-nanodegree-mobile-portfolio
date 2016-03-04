@@ -429,9 +429,9 @@ var resizePizzas = function(size) {
   // Iterates through pizza elements on the page and changes their widths
   function changePizzaSizes(size) {
 
-    //
+    // Using document.getElementByClass is faster for looking up classes
+    // than .querySelectorAll
     var randomPizzaContainer = document.getElementByClass("randomPizzaContainer");
-    // var randomPizzaContainer = document.querySelectorAll(".randomPizzaContainer");
 
     for (var i = 0, l = randomPizzaContainer.length; i < l; i++) {
        /* Rather than calculating absolute pixel changes, we can simply set the

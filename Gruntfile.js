@@ -69,8 +69,8 @@ module.exports = function(grunt) {
           expand: true,
           cwd: 'src/css',
           src: ['print.css'],
-          dest: 'css',
-          ext: '.css'
+          dest: 'dist/css',
+          ext: '.min.css'
         }]
       }
     },
@@ -80,8 +80,8 @@ module.exports = function(grunt) {
     uglify: {
       my_target: {
         files: {
-          'js/perfmatters.js': ['src/js/perfmatters.js'], // dest : src
-          'views/js/main.js': ['views/src/js/main.js'], // dest : src
+          'dist/js/perfmatters.js': ['src/js/perfmatters.js'], // dest : src
+          'dist/js/main.js': ['src/js/main.js'], // dest : src
         }
       }
     },
@@ -100,11 +100,11 @@ module.exports = function(grunt) {
           conservativeCollapse: true // preserve a single whitespace, to prevent potential errors
         },
         files: {
-          'index.html': 'index.html', // destination : source
-          'project-mobile.html' : 'project-mobile.html', // destination : source
-          'project-2048.html' : 'project-2048.html', // destination : source
-          'project-webperf.html' : 'project-webperf.html', // destination : source
-          'views/pizza.html' : 'views/pizza.html' // destination : source
+          'dist/index.html': 'dist/index.html', // destination : source
+          'dist/project-mobile.html' : 'dist/project-mobile.html', // destination : source
+          'dist/project-2048.html' : 'dist/project-2048.html', // destination : source
+          'dist/project-webperf.html' : 'dist/project-webperf.html', // destination : source
+          'dist/pizza.html' : 'dist/pizza.html' // destination : source
         }
       }
     },
@@ -119,35 +119,35 @@ module.exports = function(grunt) {
           cssmin: true
         },
         src: 'src/index.html',
-        dest: 'index.html'
+        dest: 'dist/index.html'
       },
       task2: {
         options: {
           cssmin: true
         },
         src: 'src/project-mobile.html',
-        dest: 'project-mobile.html'
+        dest: 'dist/project-mobile.html'
       },
       task3: {
         options: {
           cssmin: true
         },
         src: 'src/project-webperf.html',
-        dest: 'project-webperf.html'
+        dest: 'dist/project-webperf.html'
       },
       task4: {
         options: {
           cssmin: true
         },
         src: 'src/project-2048.html',
-        dest: 'project-2048.html'
+        dest: 'dist/project-2048.html'
       },
       task5: {
         options: {
           cssmin: true
         },
-        src: 'views/src/pizza.html',
-        dest: 'views/pizza.html'
+        src: 'src/pizza.html',
+        dest: 'dist/pizza.html'
       }
     },
 
@@ -163,7 +163,7 @@ module.exports = function(grunt) {
           jpegMini: false,
           imageAlpha: false
         },
-        src: ['img','views/images']
+        src: ['dist/images', 'dist/images/fixed']
       }
     },
 
@@ -188,8 +188,8 @@ module.exports = function(grunt) {
         files: [{
           expand: true,
           src: ['*.{gif,jpg,png,jpeg}'],
-          cwd: 'views/src/images/',
-          dest: 'views/images/'
+          cwd: 'src/images/',
+          dest: 'dist/images/'
         }]
       }
     },
@@ -197,7 +197,7 @@ module.exports = function(grunt) {
     /* Clear out the images directory if it exists */
     clean: {
       dev: {
-        src: ['views/images'],
+        src: ['dist/images'],
       },
     },
 
@@ -205,7 +205,7 @@ module.exports = function(grunt) {
     mkdir: {
       dev: {
         options: {
-          create: ['views/images']
+          create: ['dist/images']
         },
       },
     },
@@ -216,8 +216,8 @@ module.exports = function(grunt) {
         files: [{
           expand: true,
           src: '*.{gif,jpg,png}',
-          cwd: 'views/src/images/fixed/',
-          dest: 'views/images/'
+          cwd: 'src/images/fixed/',
+          dest: 'dist/images/'
         }]
       },
     },
