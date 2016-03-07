@@ -125,13 +125,13 @@ as `.offsetWidth` is a geometric property and `determinDx` also accesses `.offse
 Looking further at these two problematic lines, and `determineDx` in particular, it can be seen that these lines and the function itself are essentially unnecessary. A better approach is to simply choose a percentage value in a switch statement (assigned to `newWidth`), and assign it directly as the `.width` property, since the sizes of the pizzas are finite. This eliminates a lot of computation, as well as the layout thrashing and FSL.
 ```sh
 function changePizzaSizes(size) {
-    var randomPizzaContainer = document.getElementByClass("randomPizzaContainer");
+    var randomPizzaContainer = document.getElementsByClassName("randomPizzaContainer");
     for (var i = 0, l = randomPizzaContainer.length; i < l; i++) {
       randomPizzaContainer[i].style.width = newWidth;
     }
 }
 ```
-Notice also that `getElementByClass` is used instead of `querySelectorAll`, as it is faster when choosing classes. Additionally the for loop has been rewritten from
+Notice also that `getElementsByClassName` is used instead of `querySelectorAll`, as it is faster when choosing classes. Additionally the for loop has been rewritten from
 ```sh
 for (var i = 0; i < randomPizzaContainer.length; i++)
 ```
@@ -163,9 +163,9 @@ Rather than using `querySelectorAll`,
 ```sh
 var items = document.querySelectorAll('.mover');
 ```
-we could use `getElementByClassName`, which is faster:
+we could use `getElementsByClassName`, which is faster:
 ```sh
-var items = document.getElementByClassName('.mover');
+var items = document.getElementsByClassName('.mover');
 ```
 
 Rather than calculate length on every loop iteration,
@@ -204,7 +204,7 @@ function updatePositions() {
   for (var i = 0; i < 5; i++) {
     phase.push(Math.sin(normalizeScrollTop + i));
   }
-  var items = document.getElementByClassName('.mover');
+  var items = document.getElementsByClassName('.mover');
   for (var i = 0, len = items.length; i < len; i++) {
     var pos = items[i].basicLeft + (100 * phase[i % 5]);
     items[i].style.transform = 'translate3d(' + pos + 'px, 0, 0)';
