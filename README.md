@@ -56,8 +56,32 @@ While only the homepage was under scrutiny in this project, ultimately the above
 
 There are certainly further optimizations that could be made (for example using srcset to make images more responsive, as I've learned in [another project]), however as far as the CRP is concerned, the PageScore is high and the site seems to load in about 700-1100ms on on simulated 3G network.
 
-#### A Note on Automation
-Much of the tasks in the optimization process are highly tedious, especially if they must be re-done every time a change or update is made. To solve this I used [Grunt], a command line task runner. This allowed me to set up an automated process for most of these steps. For use, simply run `grunt` in the command line from the project directory, and the source files in the *src* directory will be optimized and placed into the *dist* directory (e.g. images will be resized and compressed, CSS will be inlined, files will be minified and uglified).
+#### A Note on Automation and Using Grunt
+Much of the tasks in the optimization process are highly tedious, especially if they must be re-done every time a change or update is made. To solve this I used [Grunt], a command line task runner. This allowed me to set up an automated process for most of these steps. Setting up a grunt process requires essentially three parts. First, a Gruntfile.js and package.json file must be created in the project directory. These files specify what Grunt needs to to, and which resources it needs to do it, respectively. Next, each of the required plugins must be installed locally. The final step is to configure the Grunt.js file itself, defining each of the tasks that need to be performed. For example, the task 'cssmin' defined here
+```sh
+cssmin: {
+    target: {
+        files: [{
+            expand: true,
+            cwd: 'src/css',
+            src: ['print.css'],
+            dest: 'dist/css',
+            ext: '.min.css'
+        }]
+    }
+}
+```
+creates a minified version of the print.css file in *scr/css*, changing the extension to ".min.css", and placing it in *dist/css*. This task can be executed from the project directory by running `grunt cssmin`. Similarly
+* `grunt inline` will inline the pretermined CSS files (marked with `?__inline=true`)
+* `grunt htmlmin` will minify the HTML files
+* `grunt uglify` will uglify the JS files
+* `grunt clean` will remove the *dist/images* directory
+* `grunt mkdir` will make a new *dist/images* directory
+* `grunt copy` will copy over images from *src/images/fixed* to *dist/images*
+* `grunt responsive_images` will resize and optimize images in *src/images* to *dist/images*
+* `grunt imageoptim` will attempt to optimize images in *dist/images*
+
+For simplest use, however, just running `grunt` from the project directory will perform all of these tasks, in the appropriate order.
 
 ##### Some of the tools and Grunt plugins I used
 - [Image Magick]
