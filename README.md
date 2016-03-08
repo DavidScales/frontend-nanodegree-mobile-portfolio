@@ -265,6 +265,9 @@ function tryRequestAnimationFrame() {
 ##### Improvement
 Initially the site's frames per second (fps) was about 13 or 14, and the `updatePositions` function itself took about 55ms to execute. After the optimizations, `updatePositions` executes in about 0.3-0.6ms, and the frame rate is consistently 55-60fps.
 
+### Running the Project
+To run the project, download (select "Download ZIP") or clone the repository, and then open index.html (with a browser) in the *src* directory. To examine the pizzeria page, simply navigate to it from the home page, or open pizza.html instead of index.html.
+
 
 [Google's PageSpeed Insights]: <https://developers.google.com/speed/pagespeed/insights/>
 [Web Performance Optimization]: <https://github.com/udacity/frontend-nanodegree-mobile-portfolio>
