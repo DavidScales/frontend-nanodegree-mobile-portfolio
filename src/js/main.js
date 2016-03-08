@@ -543,9 +543,9 @@ document.addEventListener('DOMContentLoaded', function() {
   var s = 256;
   /* Rather than use a hard-coded value of pizzas elements that is potentially too
    large (manipulating more elements than are even visible one the screen!) or too
-   small (not enough elements visible on the screen) The optimal number can be
-   calculated by using the window width and height. */
-  var cols = Math.floor(window.innerWidth / s) + 1;
+   small (not enough elements visible on the screen) A more optimal number can be
+   calculated by using the window height. */
+  var cols = 8; // cols hard coded to avoid math issues with animation in updatePositions
   var rows = Math.floor(window.innerHeight / s) + 1;
   var numPizzas = rows * cols;
   for (var i = 0; i < numPizzas; i++) {
@@ -556,6 +556,8 @@ document.addEventListener('DOMContentLoaded', function() {
     elem.style.width = "73.333px";
     elem.basicLeft = (i % cols) * s;
     elem.style.top = (Math.floor(i / cols) * s) + 'px';
+    // Ensure each element starts at the left edge
+    elem.style.left = 0;
     document.querySelector("#movingPizzas1").appendChild(elem);
   }
   updatePositions();

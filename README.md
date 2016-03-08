@@ -216,14 +216,14 @@ Further, rather than initially generating 200 pizza items (most of which aren't 
 ```sh
 for (var i = 0; i < 200; i++)
 ```
-we can calculate the minimum needed to cover the visible window:
+we can calculate a more optimal amount (originally I had calculated the *minimum*, by letting `cols` be based on window width, however this led to potential problems with the math used in `updatePositions`), that still covers the visible window:
 ```sh
-var cols = Math.floor(window.innerWidth / s) + 1;
+var cols = 8;
 var rows = Math.floor(window.innerHeight / s) + 1;
 var numPizzas = rows * cols;
 for (var i = 0; i < numPizzas; i++)
 ```
-This means that instead of updating 200 objects, we may only need to update 25-35. And finally, rather than updating on every scroll event with
+This means that instead of updating 200 objects, we may only need to update perhaps 30-35. And finally, rather than updating on every scroll event with
 ```sh
 window.addEventListener('scroll', updatePositions);
 ```
